@@ -6,6 +6,7 @@ var AsValidatedView = require('../../../Mixins/AsValidatedView');
 var AsEditModalView = require('../../../Mixins/AsEditModalView');
 require('../../../Form/FormBuilder');
 require('../../../Mixins/TagInput');
+require('../../../Mixins/FileBrowser');
 
 var view = Marionette.ItemView.extend({
     template : 'Settings/Notifications/Edit/NotificationEditViewTemplate',
@@ -13,7 +14,9 @@ var view = Marionette.ItemView.extend({
     ui : {
         onDownloadToggle : '.x-on-download',
         onUpgradeSection : '.x-on-upgrade',
-        tags             : '.x-tags'
+        tags             : '.x-tags',
+        modalBody        : '.modal-body',
+        path             : '.x-path'
     },
 
     events : {
@@ -33,6 +36,14 @@ var view = Marionette.ItemView.extend({
             model    : this.model,
             property : 'tags'
         });
+    },
+
+    onShow : function() {
+        if (this.ui.path.length > 0) {
+            this.ui.modalBody.addClass('modal-overflow');
+        }
+
+        this.ui.path.fileBrowser();
     },
 
     _onAfterSave : function() {

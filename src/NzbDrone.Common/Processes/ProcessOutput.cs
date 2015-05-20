@@ -5,6 +5,7 @@ namespace NzbDrone.Common.Processes
 {
     public class ProcessOutput
     {
+        public int ExitCode { get; set; }
         public List<String> Standard { get; private set; }
         public List<String> Error { get; private set; }
 

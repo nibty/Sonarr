@@ -671,6 +671,9 @@
     <Compile Include="Metadata\MetadataType.cs" />
     <Compile Include="MetadataSource\IProvideSeriesInfo.cs" />
     <Compile Include="MetadataSource\ISearchForNewSeries.cs" />
+    <Compile Include="Notifications\CustomScript\CustomScript.cs" />
+    <Compile Include="Notifications\CustomScript\CustomScriptService.cs" />
+    <Compile Include="Notifications\CustomScript\CustomScriptSettings.cs" />
     <Compile Include="Notifications\Plex\PlexHomeTheater.cs" />
     <Compile Include="Notifications\Plex\PlexHomeTheaterSettings.cs" />
     <Compile Include="Notifications\Synology\SynologyException.cs" />
