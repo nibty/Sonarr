@@ -15,6 +15,7 @@ namespace NzbDrone.Core.Notifications.CustomScript
 
         public override string Link
         {
+            //TODO: Provide a proper link on how to use the custom script
             get { return "http://wiki.sonarr.tv/"; }
         }
 
