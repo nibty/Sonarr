@@ -9,6 +9,7 @@ var FooterView = require('./SeasonPassFooterView');
 var SelectAllCell = require('../Cells/SelectAllCell');
 var SeriesStatusCell = require('../Cells/SeriesStatusCell');
 var SeriesTitleCell = require('../Cells/SeriesTitleCell');
+var SeasonsCell = require('./SeasonsCell');
 require('../Mixins/backbone.signalr.mixin');
 
 module.exports = Marionette.Layout.extend({
@@ -36,6 +37,12 @@ module.exports = Marionette.Layout.extend({
             label     : 'Title',
             cell      : SeriesTitleCell,
             cellValue : 'this'
+        },
+        {
+            name      : 'seasons',
+            label     : 'Seasons',
+            cell      : SeasonsCell,
+            cellValue : 'this'
         }
     ],
 
@@ -43,7 +50,7 @@ module.exports = Marionette.Layout.extend({
         this.seriesCollection = SeriesCollection.clone();
         this.seriesCollection.shadowCollection.bindSignalR();
 
-        this.listenTo(this.seriesCollection, 'sync', this.render);
+//        this.listenTo(this.seriesCollection, 'sync', this.render);
         this.listenTo(this.seriesCollection, 'seasonpass:saved', this.render);
 
         this.filteringOptions = {

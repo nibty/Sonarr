@@ -1,0 +1,10 @@
+{{#each seasons}}
+    <span class="season label label-default">
+        <span>
+            <span class="x-season-monitored season-monitored" title="Toggle season monitored status" data-season-number="{{seasonNumber}}">
+                <i class="x-season-monitored-icon {{#if monitored}}icon-sonarr-monitored{{else}}icon-sonarr-unmonitored{{/if}}"/>
+            </span>
+        </span>
+        <span class="season-number">Season {{seasonNumber}}</span>
+    </span>
+{{/each}}
