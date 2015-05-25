@@ -96,7 +96,7 @@ namespace NzbDrone.Update.UpdateEngine
                     _diskProvider.EmptyFolder(installationFolder);
 
                     _logger.Info("Copying new files to target folder");
-                    _diskTransferService.TransferFolder(_appFolderInfo.GetUpdatePackageFolder(), installationFolder, TransferMode.Copy);
+                    _diskTransferService.TransferFolder(_appFolderInfo.GetUpdatePackageFolder(), installationFolder, TransferMode.Copy, false);
 
                     // Set executable flag on Sonarr app
                     if (OsInfo.IsOsx)

@@ -50,7 +50,7 @@ namespace NzbDrone.Core.Tv
             //TODO: Move to transactional disk operations
             try
             {
-                _diskTransferService.TransferFolderVerified(source, destination, TransferMode.Move);
+                _diskTransferService.TransferFolder(source, destination, TransferMode.Move);
             }
             catch (IOException ex)
             {

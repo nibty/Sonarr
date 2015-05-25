@@ -26,8 +26,8 @@ namespace NzbDrone.Common.Disk
         long GetFileSize(string path);
         void CreateFolder(string path);
         void DeleteFile(string path);
-        void CopySingleFile(string source, string destination, bool overwrite = false);
-        void MoveSingleFile(string source, string destination, bool overwrite = false);
+        void CopyFile(string source, string destination, bool overwrite = false);
+        void MoveFile(string source, string destination, bool overwrite = false);
         bool TryCreateHardLink(string source, string destination);
         void DeleteFolder(string path, bool recursive);
         string ReadAllText(string filePath);

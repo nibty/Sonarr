@@ -72,8 +72,8 @@ namespace NzbDrone.Common.Test.DiskTests
             File.WriteAllText(source1, "SourceFile1");
             File.WriteAllText(source2, "SourceFile2");
 
-            Subject.MoveSingleFile(source1, destination);
-            Subject.MoveSingleFile(source2, destination, true);
+            Subject.MoveFile(source1, destination);
+            Subject.MoveFile(source2, destination, true);
 
             File.Exists(destination).Should().BeTrue();
         }
@@ -85,10 +85,9 @@ namespace NzbDrone.Common.Test.DiskTests
 
             File.WriteAllText(source, "SourceFile1");
 
-            Subject.MoveSingleFile(source, source, true);
+            Assert.Throws<IOException>(() => Subject.MoveFile(source, source, true));
 
             File.Exists(source).Should().BeTrue();
-            ExceptionVerification.ExpectedWarns(1);
         }
 
         [Test]
@@ -103,7 +102,7 @@ namespace NzbDrone.Common.Test.DiskTests
             File.SetAttributes(source, FileAttributes.ReadOnly);
             File.SetAttributes(destination, FileAttributes.ReadOnly);
 
-            Subject.MoveSingleFile(source, destination, true);
+            Subject.MoveFile(source, destination, true);
         }
 
         [Test]
@@ -227,7 +226,7 @@ namespace NzbDrone.Common.Test.DiskTests
             {
                 stream.ReadByte();
 
-                Subject.MoveSingleFile(destination, rename);
+                Subject.MoveFile(destination, rename);
 
                 stream.ReadByte();
             }

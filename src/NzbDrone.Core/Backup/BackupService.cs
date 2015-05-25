@@ -118,7 +118,7 @@ namespace NzbDrone.Core.Backup
                 var databaseFile = _appFolderInfo.GetNzbDroneDatabase();
                 var tempDatabaseFile = Path.Combine(_backupTempFolder, Path.GetFileName(databaseFile));
 
-                _diskTransferService.TransferFileVerified(databaseFile, tempDatabaseFile, TransferMode.Copy);
+                _diskTransferService.TransferFile(databaseFile, tempDatabaseFile, TransferMode.Copy);
 
                 unitOfWork.Commit();
             }
@@ -131,7 +131,7 @@ namespace NzbDrone.Core.Backup
             var configFile = _appFolderInfo.GetConfigPath();
             var tempConfigFile = Path.Combine(_backupTempFolder, Path.GetFileName(configFile));
 
-            _diskTransferService.TransferFileVerified(configFile, tempConfigFile, TransferMode.Copy);
+            _diskTransferService.TransferFile(configFile, tempConfigFile, TransferMode.Copy);
         }
 
         private void CleanupOldBackups(BackupType backupType)

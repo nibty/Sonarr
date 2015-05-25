@@ -31,7 +31,7 @@ namespace NzbDrone.Common.Test.DiskTests
         {
             WithSuccessfulHardlink();
 
-            var result = Subject.TransferFileVerified(_sourcePath, _targetPath, TransferMode.HardLink);
+            var result = Subject.TransferFile(_sourcePath, _targetPath, TransferMode.HardLink);
 
             result.Should().Be(TransferMode.HardLink);
         }
@@ -39,7 +39,7 @@ namespace NzbDrone.Common.Test.DiskTests
         [Test]
         public void should_throw_if_hardlink_only_failed()
         {
-            Assert.Throws<IOException>(() => Subject.TransferFileVerified(_sourcePath, _targetPath, TransferMode.HardLink));
+            Assert.Throws<IOException>(() => Subject.TransferFile(_sourcePath, _targetPath, TransferMode.HardLink));
         }
 
         [Test]
@@ -49,13 +49,13 @@ namespace NzbDrone.Common.Test.DiskTests
 
             var retry = 0;
             Mocker.GetMock<IDiskProvider>()
-                .Setup(v => v.CopySingleFile(_sourcePath, _targetPath, false))
+                .Setup(v => v.CopyFile(_sourcePath, _targetPath, false))
                 .Callback(() =>
                     {
                         if (retry++ == 1) WithCompletedTransfer();
                     });
 
-            var result = Subject.TransferFileVerified(_sourcePath, _targetPath, TransferMode.Copy);
+            var result = Subject.TransferFile(_sourcePath, _targetPath, TransferMode.Copy);
 
             ExceptionVerification.ExpectedWarns(1);
         }
@@ -67,15 +67,15 @@ namespace NzbDrone.Common.Test.DiskTests
 
             var retry = 0;
             Mocker.GetMock<IDiskProvider>()
-                .Setup(v => v.CopySingleFile(_sourcePath, _targetPath, false))
+                .Setup(v => v.CopyFile(_sourcePath, _targetPath, false))
                 .Callback(() =>
                     {
                         if (retry++ == 3) throw new Exception("Test Failed, retried too many times.");
                     });
 
-            Assert.Throws<IOException>(() => Subject.TransferFileVerified(_sourcePath, _targetPath, TransferMode.Copy));
+            Assert.Throws<IOException>(() => Subject.TransferFile(_sourcePath, _targetPath, TransferMode.Copy));
 
-            ExceptionVerification.ExpectedWarns(1);
+            ExceptionVerification.ExpectedWarns(2);
             ExceptionVerification.ExpectedErrors(1);
         }
 
@@ -85,7 +85,7 @@ namespace NzbDrone.Common.Test.DiskTests
             WithSuccessfulHardlink();
             WithCompletedTransfer();
 
-            var result = Subject.TransferFileVerified(_sourcePath, _targetPath, TransferMode.Move);
+            var result = Subject.TransferFile(_sourcePath, _targetPath, TransferMode.Move);
 
             Mocker.GetMock<IDiskProvider>()
                 .Verify(v => v.TryCreateHardLink(_sourcePath, _backupPath), Times.Once());
@@ -97,7 +97,7 @@ namespace NzbDrone.Common.Test.DiskTests
             WithSuccessfulHardlink();
             WithCompletedTransfer();
 
-            var result = Subject.TransferFileVerified(_sourcePath, _targetPath, TransferMode.Move);
+            var result = Subject.TransferFile(_sourcePath, _targetPath, TransferMode.Move);
 
             VerifyDeletedFile(_sourcePath);
         }
@@ -117,14 +117,14 @@ namespace NzbDrone.Common.Test.DiskTests
                     });
 
             Mocker.GetMock<IDiskProvider>()
-                .Setup(v => v.MoveSingleFile(_backupPath, _targetPath, false))
+                .Setup(v => v.MoveFile(_backupPath, _targetPath, false))
                 .Throws(new IOException("Blackbox IO error"));
 
-            Assert.Throws<IOException>(() => Subject.TransferFileVerified(_sourcePath, _targetPath, TransferMode.Move));
+            Assert.Throws<IOException>(() => Subject.TransferFile(_sourcePath, _targetPath, TransferMode.Move));
 
             VerifyDeletedFile(_backupPath);
 
-            ExceptionVerification.ExpectedWarns(1);
+            ExceptionVerification.ExpectedWarns(2);
             ExceptionVerification.ExpectedErrors(1);
         }
 
@@ -133,10 +133,10 @@ namespace NzbDrone.Common.Test.DiskTests
         {
             WithCompletedTransfer();
 
-            var result = Subject.TransferFileVerified(_sourcePath, _targetPath, TransferMode.Move);
+            var result = Subject.TransferFile(_sourcePath, _targetPath, TransferMode.Move);
 
             Mocker.GetMock<IDiskProvider>()
-                .Verify(v => v.CopySingleFile(_sourcePath, _targetPath, false), Times.Once());
+                .Verify(v => v.CopyFile(_sourcePath, _targetPath, false), Times.Once());
 
             VerifyDeletedFile(_sourcePath);
         }
@@ -205,6 +205,24 @@ namespace NzbDrone.Common.Test.DiskTests
             VerifyMoveFolder(original.FullName, source.FullName, destination.FullName);
         }
 
+        [Test]
+        public void should_throw_if_destination_is_readonly()
+        {
+            Mocker.GetMock<IDiskProvider>()
+                .Setup(v => v.CopyFile(It.IsAny<string>(), It.IsAny<string>(), false))
+                .Throws(new IOException("Access denied"));
+
+            Assert.Throws<IOException>(() => Subject.TransferFile(_sourcePath, _targetPath, TransferMode.Move));
+        }
+
+        [Test]
+        public void should_throw_if_destination_is_child_of_source()
+        {
+            var childPath = Path.Combine(_sourcePath, "child");
+
+            Assert.Throws<IOException>(() => Subject.TransferFile(_sourcePath, childPath, TransferMode.Move));
+        }
+
         public DirectoryInfo GetFilledTempFolder()
         {
             var tempFolder = GetTempFilePath();
@@ -231,12 +249,20 @@ namespace NzbDrone.Common.Test.DiskTests
         private void WithCompletedTransfer()
         {
             Mocker.GetMock<IDiskProvider>()
+                .Setup(v => v.FileExists(_targetPath))
+                .Returns(true);
+
+            Mocker.GetMock<IDiskProvider>()
                 .Setup(v => v.GetFileSize(_targetPath))
                 .Returns(1000);
         }
 
         private void WithIncompleteTransfer()
         {
+            Mocker.GetMock<IDiskProvider>()
+                .Setup(v => v.FileExists(_targetPath))
+                .Returns(true);
+
             Mocker.GetMock<IDiskProvider>()
                 .Setup(v => v.GetFileSize(_targetPath))
                 .Returns(900);
@@ -273,11 +299,11 @@ namespace NzbDrone.Common.Test.DiskTests
                 .Returns<string>(v => new DirectoryInfo(v).GetFiles().ToList());
 
             Mocker.GetMock<IDiskProvider>()
-                .Setup(v => v.CopySingleFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()))
+                .Setup(v => v.CopyFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()))
                 .Callback<string, string, bool>((s, d, o) => File.Copy(s, d, o));
 
             Mocker.GetMock<IDiskProvider>()
-                .Setup(v => v.MoveSingleFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()))
+                .Setup(v => v.MoveFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()))
                 .Callback<string, string, bool>((s,d,o) => {
                     if (File.Exists(d) && o) File.Delete(d);
                     File.Move(s, d);

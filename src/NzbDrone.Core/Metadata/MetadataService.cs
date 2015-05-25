@@ -191,7 +191,7 @@ namespace NzbDrone.Core.Metadata
                 var existingFullPath = Path.Combine(series.Path, existingMetadata.RelativePath);
                 if (!fullPath.PathEquals(existingFullPath))
                 {
-                    _diskTransferService.TransferFileVerified(existingFullPath, fullPath, TransferMode.Move);
+                    _diskTransferService.TransferFile(existingFullPath, fullPath, TransferMode.Move);
                     existingMetadata.RelativePath = episodeMetadata.RelativePath;
                 }
             }
@@ -243,7 +243,7 @@ namespace NzbDrone.Core.Metadata
                                    RelativePath = image.RelativePath
                                };
 
-                _diskProvider.CopySingleFile(image.Url, image.RelativePath);
+                _diskProvider.CopyFile(image.Url, image.RelativePath);
 
                 result.Add(metadata);
             }
@@ -312,7 +312,7 @@ namespace NzbDrone.Core.Metadata
                     var existingFullPath = Path.Combine(series.Path, existingMetadata.RelativePath);
                     if (!fullPath.PathEquals(existingFullPath))
                     {
-                        _diskTransferService.TransferFileVerified(existingFullPath, fullPath, TransferMode.Move);
+                        _diskTransferService.TransferFile(existingFullPath, fullPath, TransferMode.Move);
                         existingMetadata.RelativePath = image.RelativePath;
 
                         return new List<MetadataFile>{ existingMetadata };

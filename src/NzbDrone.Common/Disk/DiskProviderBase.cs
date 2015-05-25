@@ -178,29 +178,27 @@ namespace NzbDrone.Common.Disk
             File.Delete(path);
         }
 
-        public void CopySingleFile(string source, string destination, bool overwrite = false)
+        public void CopyFile(string source, string destination, bool overwrite = false)
         {
             Ensure.That(source, () => source).IsValidPath();
             Ensure.That(destination, () => destination).IsValidPath();
 
             if (source.PathEquals(destination))
             {
-                Logger.Warn("Source and destination can't be the same {0}", source);
-                return;
+                throw new IOException(string.Format("Source and destination can't be the same {0}", source));
             }
 
             File.Copy(source, destination, overwrite);
         }
 
-        public void MoveSingleFile(string source, string destination, bool overwrite = false)
+        public void MoveFile(string source, string destination, bool overwrite = false)
         {
             Ensure.That(source, () => source).IsValidPath();
             Ensure.That(destination, () => destination).IsValidPath();
 
             if (source.PathEquals(destination))
             {
-                Logger.Warn("Source and destination can't be the same {0}", source);
-                return;
+                throw new IOException(string.Format("Source and destination can't be the same {0}", source));
             }
 
             if (FileExists(destination) && overwrite)

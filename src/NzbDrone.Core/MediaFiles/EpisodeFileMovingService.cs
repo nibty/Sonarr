@@ -125,7 +125,7 @@ namespace NzbDrone.Core.MediaFiles
                 }
             }
 
-            _diskTransferService.TransferFileVerified(episodeFilePath, destinationFilename, mode);
+            _diskTransferService.TransferFile(episodeFilePath, destinationFilename, mode);
 
             episodeFile.RelativePath = series.Path.GetRelativePath(destinationFilename);
 

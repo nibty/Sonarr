@@ -38,8 +38,8 @@ namespace NzbDrone.Update.UpdateEngine
 
             try
             {
-                _diskTransferService.TransferFileVerified(_appFolderInfo.GetConfigPath(), _appFolderInfo.GetUpdateBackupConfigFile(), TransferMode.Copy);
-                _diskTransferService.TransferFileVerified(_appFolderInfo.GetNzbDroneDatabase(), _appFolderInfo.GetUpdateBackupDatabase(), TransferMode.Copy);
+                _diskTransferService.TransferFile(_appFolderInfo.GetConfigPath(), _appFolderInfo.GetUpdateBackupConfigFile(), TransferMode.Copy);
+                _diskTransferService.TransferFile(_appFolderInfo.GetNzbDroneDatabase(), _appFolderInfo.GetUpdateBackupDatabase(), TransferMode.Copy);
             }
             catch (Exception e)
             {
